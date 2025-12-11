@@ -15,10 +15,10 @@ wa_dots <- read_csv("data/pre_auto_poi.csv", show_col_types = FALSE) %>%
   mutate(geometry = st_as_sfc(geometry_wkt, crs = 4326)) %>%
   st_as_sf() %>%
   st_transform(6596) %>% 
-  mutate(city_name = str_remove_all(city_name, ', Washington'))
+  mutate(city_name = str_remove_all(city_name, ", Washington"))
 
 # Quick sanity check: visually confirm points 
-maplibre_view(wa_dots %>% filter(city_name == 'Ritzville'))
+maplibre_view(wa_dots %>% filter(city_name == "Ritzville"))
 
 # Pre-auto WA place polygons (universe of towns/cities of interest),
 # created in the first script and saved with WKT geometry in EPSG:6596. 
@@ -29,7 +29,7 @@ pre_auto_sf <- read_csv("data/wa_pre_auto_places.csv", show_col_types = FALSE) %
   mutate(
     city_name = str_replace(city_name, " city", ""),
     city_name = str_replace(city_name, " town", ""),
-    city_name = str_remove_all(city_name, ', Washington')
+    city_name = str_remove_all(city_name, ", Washington")
   )
 
 
@@ -117,7 +117,7 @@ pre_auto_sf <- pre_auto_sf %>%
   )
 
 # maplibre_view() gives a fast visual check. 
-test_name <- 'Morton'
+test_name <- "Morton"
 test_town <- pre_auto_sf %>% filter(city_name == test_name)
 test_dots <- wa_dots %>% filter(city_name == test_name)
 test_fips <- pull(test_town, city_fips)
@@ -169,25 +169,25 @@ b <- mapboxgl(bounds = test_town, style = mapbox_style("satellite")) %>%
 compare(a,b)
 
 ggplot() + 
-  geom_sf(data = test_town, color = 'white', fill = 'grey20', linewidth = 0.8) + 
-  geom_sf(data = test, fill = 'dodgerblue', alpha = .6, color = 'white', linewidth = 0.5) + 
-  geom_sf(data = test_rds, color = 'gray70', alpha = .4, linewidth = 0.3) + 
-  geom_sf(data = test_dots, color = '#FF4444', alpha = .75, size = 1.25) + 
+  geom_sf(data = test_town, color = "white", fill = "grey20", linewidth = 0.8) + 
+  geom_sf(data = test, fill = "dodgerblue", alpha = .6, color = "white", linewidth = 0.5) + 
+  geom_sf(data = test_rds, color = "gray70", alpha = .4, linewidth = 0.3) + 
+  geom_sf(data = test_dots, color = "#FF4444", alpha = .75, size = 1.25) + 
   labs(
     title = "Downtown District Delineation",
     subtitle = glue("{test_name}, WA"),
-    caption = 'Source: Overture Maps, 2025        \n'
+    caption = "Source: Overture Maps, 2025        \n"
   ) +
-  theme_void(base_family = 'Styrene A', base_size = 18) + 
+  theme_void(base_family = "Styrene A", base_size = 18) + 
   theme(
-    plot.title = element_text(face = "bold", hjust = 0.5, color = 'white',
+    plot.title = element_text(face = "bold", hjust = 0.5, color = "white",
                               margin = margin(t = 20)),
-    plot.subtitle = element_text(hjust = 0.5, color = 'gray90'),
-    plot.caption = element_text(color = 'gray70', size = 12),
-    plot.background = element_rect(color = 'white'),
+    plot.subtitle = element_text(hjust = 0.5, color = "gray90"),
+    plot.caption = element_text(color = "gray70", size = 12),
+    plot.background = element_rect(color = "white"),
   )
 
-ggsave('plot/demo_dark.png', width = 11, height = 8.5, dpi = 300)
+ggsave("plot/demo_dark.png", width = 11, height = 8.5, dpi = 300)
 
 
 # ---------------- RUN FOR ALL WA TOWNS ----------------

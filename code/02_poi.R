@@ -22,7 +22,7 @@ wa_geojson   <- "data/places_washington.geojsonl"
 # Load the CSV created in the previous script
 pre_auto <- read_csv(pre_auto_csv, show_col_types = FALSE) %>% 
   select(1:2) %>% 
-  mutate(city_fips = str_pad(city_fips, width = 5, pad = '0'))
+  mutate(city_fips = str_pad(city_fips, width = 5, pad = "0"))
 
 # Get WA place polygons from TIGER and keep only those in the pre-auto universe. 
 pre_auto_sf <- places("WA", cb = TRUE) %>%
@@ -54,7 +54,7 @@ bbox_string <- sprintf(
 pmtiles_path <- Sys.which("pmtiles")
 
 if (pmtiles_path == "") {
-  stop('pmtiles not found. Install with: brew install pmtiles')
+  stop("pmtiles not found. Install with: brew install pmtiles")
 }
 
 
@@ -67,7 +67,7 @@ if (file.exists(wa_geojson)) {
   # Construct a system command to extract the WA bounding box from the global
   # places PMTiles archive to a GeoJSONL file. [web:26][web:67]
   cmd <- sprintf(
-    '"%s" extract "%s" "%s" --bbox="%s"',
+    ""%s" extract "%s" "%s" --bbox="%s"",
     pmtiles_path,
     pmtiles_url,
     wa_geojson,
@@ -107,7 +107,7 @@ pre_auto_poi <- wa_poi %>%
 maplibre_view(pre_auto_poi %>% filter(str_detect(city_name, "Kelso")))
         
 pre_auto_poi_out <- pre_auto_poi %>%
-  st_transform(4326) |> 
+  st_transform(4326) %>% 
   mutate(geometry_wkt = st_as_text(geometry)) %>%
   st_drop_geometry() %>%
   mutate(

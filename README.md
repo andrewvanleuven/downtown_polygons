@@ -1,6 +1,6 @@
-# Downtown polygons for Washington towns
+# Automated Downtown Delineation for Smaller U.S. Towns & Cities
 
-This repo builds approximate downtown/central business district polygons for a universe of Washington towns and small cities, using historical population data and modern points-of-interest (POI) data.
+This repo demonstrates a reproducible method for delineating downtown/central business district polygons using historical population data and modern points-of-interest (POI) data. While the example focuses on Washington state, the approach is designed to work for any U.S. state—simply update the state code in the scripts.
 
 <p align="center">
 
@@ -39,7 +39,7 @@ The pre-auto town universe is constructed in the first script ([`01_build_preaut
 -   Join places to the **historical population series** from the Wikipedia-derived CSVs by normalizing place names (e.g., removing “city”, “town”, “village” suffixes) and handling a few ad hoc name fixes (e.g., “Seattle” → “Seattle, Washington”).
 -   Attach **RUCC codes** at the county level via place centroids intersected with counties and the USDA RUCC table.
 
-A place is included in the pre-auto universe if it satisfies a set of criteria that closely follow the approach in my 2022 [*Cityscape* article](https://www.jstor.org/stable/48657957) on defining pre-automobile downtown business districts.
+A place is included in the pre-auto universe if it satisfies a set of criteria that closely follow the approach in my 2022 [*Cityscape* article](https://www.jstor.org/stable/48657957) on defining pre-automobile downtown business districts:
 
 -   It has population ≥ 750 in at least one pre–World War II decennial year: 1900, 1910, 1920, 1930, or 1940.\
 -   It is not in the most urban RUCC category (`rucc > 1`).\
@@ -82,4 +82,8 @@ The output is an `sf` object of Washington places that meet these criteria, save
 
 The animation below shows the delineated downtown polygon for Morton, WA, visualized with the `mapgl` R package. Red points represent POIs used in the kernel density estimation, while the blue polygon marks the resulting downtown district boundary. This visualization provides a quick check of whether the automated delineation aligns with the town's actual commercial core.
 
-![Morton downtown animation](plot/demo.gif)
+<p align="center">
+
+<img src="plot/demo.gif" alt="Morton downtown animation" width="80%"/>
+
+</p>
