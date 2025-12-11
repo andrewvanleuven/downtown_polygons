@@ -5,26 +5,43 @@ library(smoothr)
 library(tigris)
 library(mapgl)
 library(rleuven)
+library(crsuggest)
 library(sfhotspot)
 
 # ---------------- INPUT DATA ----------------
 
+# Pick a state
+st_list <- "WA"
+
+# Find the best CRS for plotting/GIS
+crs_best <- counties(st_list, cb = TRUE) %>% 
+  suggest_crs() %>% 
+  filter(crs_units == "m") %>% 
+  first() %>% 
+  pull(crs_code) %>% 
+  as.numeric()
+
 # Point-of-interest dots intersected with the pre-auto universe (from previous script).
 # These are stored as a CSV with WKT geometry in geometry_wkt (lon/lat, EPSG:4326). 
-wa_dots <- read_csv("data/pre_auto_poi.csv", show_col_types = FALSE) %>%
+st_dots <- read_csv("data/pre_auto_poi.csv", show_col_types = FALSE) %>%
   mutate(geometry = st_as_sfc(geometry_wkt, crs = 4326)) %>%
   st_as_sf() %>%
-  st_transform(6596) %>% 
+  st_transform(crs_best) %>% 
   mutate(city_name = str_remove_all(city_name, ", Washington"))
 
 # Quick sanity check: visually confirm points 
-maplibre_view(wa_dots %>% filter(city_name == "Ritzville"))
+maplibre_view(st_dots %>% filter(city_name == "Kelso"))
 
 # Pre-auto WA place polygons (universe of towns/cities of interest),
-# created in the first script and saved with WKT geometry in EPSG:6596. 
-pre_auto_sf <- read_csv("data/wa_pre_auto_places.csv", show_col_types = FALSE) %>%
-  mutate(geometry = st_as_sfc(geometry_wkt, crs = 6596)) %>%
-  st_as_sf() %>%
+pre_auto <- read_csv("data/st_pre_auto_places.csv", show_col_types = FALSE) %>% 
+  select(1:5) %>%
+  mutate(city_fips = str_pad(city_fips, width = 5, pad = "0"))
+
+pre_auto_sf <- places(st_list, cb = TRUE) %>%
+  st_transform(crs = crs_best) %>%
+  select(city_fips = GEOID) %>%
+  filter(city_fips %in% pull(pre_auto, city_fips)) %>% 
+  left_join(pre_auto) %>%
   # Clean up city names for nicer labels / joins.
   mutate(
     city_name = str_replace(city_name, " city", ""),
@@ -57,7 +74,7 @@ downtown_kde <- function(tfips) {
     st_as_sf()
   
   # POI dots within that town (point-in-polygon filter)
-  town_dots <- wa_dots %>%
+  town_dots <- st_dots %>%
     filter(city_fips == tfips) %>%
     st_intersection(town_sf) %>%
     select(geometry)
@@ -99,8 +116,7 @@ downtown_kde <- function(tfips) {
     mutate(score = n_hexes * mean_kdz) %>%
     filter(score == max(score, na.rm = TRUE)) %>%
     st_buffer(30, joinStyle = "MITRE", endCapStyle = "SQUARE") %>%
-    smooth(method = "ksmooth", smoothness = 5) %>% 
-    st_buffer(50)
+    smooth(method = "ksmooth", smoothness = 5) %>% st_buffer(50)
   
   best_blob
 }
@@ -109,7 +125,7 @@ downtown_kde <- function(tfips) {
 # ---------------- QUICK TEST ----------------
 # Fix broken Roslyn, WA 
 pre_auto_sf <- pre_auto_sf %>%
-  filter(city_name != "Roslyn") %>% 
+  filter(city_name != "Roslyn") %>%
   bind_rows(
     filter(pre_auto_sf, city_name == "Roslyn") %>%
       st_cast("POLYGON") %>%
@@ -119,7 +135,7 @@ pre_auto_sf <- pre_auto_sf %>%
 # maplibre_view() gives a fast visual check. 
 test_name <- "Morton"
 test_town <- pre_auto_sf %>% filter(city_name == test_name)
-test_dots <- wa_dots %>% filter(city_name == test_name)
+test_dots <- st_dots %>% filter(city_name == test_name)
 test_fips <- pull(test_town, city_fips)
 test_cfips <- pull(test_town, cty_fips)
 test_rds <- roads(state = str_sub(test_cfips, end = 2),
@@ -175,7 +191,7 @@ ggplot() +
   geom_sf(data = test_dots, color = "#FF4444", alpha = .75, size = 1.25) + 
   labs(
     title = "Downtown District Delineation",
-    subtitle = glue("{test_name}, WA"),
+    subtitle = glue("{test_name}, {st_list}"),
     caption = "Source: Overture Maps, 2025        \n"
   ) +
   theme_void(base_family = "Styrene A", base_size = 18) + 
@@ -223,7 +239,7 @@ maplibre_view(all_blobs)
 # Write WA downtown polygons to GeoJSON (overwrite if it exists). 
 st_write(
   all_blobs,
-  "data/wa_downtowns.geojson",
+  "data/st_downtowns.geojson",
   append    = FALSE,
   delete_dsn = TRUE
 )

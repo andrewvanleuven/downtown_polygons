@@ -9,7 +9,7 @@ library(mapgl)       # visualizing spatial data
 
 # State selection -----------------------------------------------------------
 
-walist <- c("WA")
+st_list <- c("WA")
 
 # Historical town/city populations (CSV from GitHub) -----------------------
 
@@ -17,7 +17,7 @@ walist <- c("WA")
 # This block reads the WA CSV, keeps the year columns, drops counties, and sorts.
 
 hist_pops <- map_dfr(
-  .x = walist,
+  .x = st_list,
   .f = function(x) {
     filen <- sprintf(
       "https://github.com/CreatingData/Historical-Populations/raw/refs/heads/master/wikipedia_state_data/%s.csv",
@@ -36,7 +36,7 @@ hist_pops <- map_dfr(
 # Download WA counties (cartographic boundary, 1:5m), project to EPSG:6350,
 # and keep only county GEOID for later joins. 
 
-wa_cty <- counties(walist, cb = TRUE, resolution = "5m") %>%
+st_cty <- counties(st_list, cb = TRUE, resolution = "5m") %>%
   st_transform(crs = 6596) %>%
   select(cty_fips = GEOID)
 
@@ -46,17 +46,17 @@ wa_cty <- counties(walist, cb = TRUE, resolution = "5m") %>%
 # Get 2020 place-level total population ("P1_001N") for WA with geometries,
 # project, convert to centroids, then intersect with counties to attach cty_fips. 
 
-wa_pops <- tidycensus::get_decennial(
+st_pops <- get_decennial(
   geography = "place",
   variables = "P1_001N",
-  state = walist,
+  state = st_list,
   year = 2020,
   geometry = TRUE
 ) %>%
   select(city_fips = 1, city_name = 2, pop20 = 4) %>%
   st_transform(crs = 6596) %>%
   st_centroid() %>%
-  st_intersection(wa_cty) %>%
+  st_intersection(st_cty) %>%
   st_drop_geometry()
 
 
@@ -89,7 +89,7 @@ normalize_city_name <- function(name) {
 
 # Clean 2020 WA place names and filter out CDPs ----------------------------
 
-wa_pops2 <- wa_pops %>%
+st_pops2 <- st_pops %>%
   arrange(city_fips) %>%
   mutate(clean_name = normalize_city_name(city_name)) %>%
   filter(str_detect(city_name, "CDP", negate = TRUE))
@@ -115,7 +115,7 @@ hist_pops2 <- hist_pops %>%
 # 3. Keep FIPS, names, county FIPS, RUCC, historical years 1790–2010, and 2020 population.
 # 4. Drop places with missing 2010 population.
 
-joined <- left_join(wa_pops2, hist_pops2, by = "clean_name") %>%
+joined <- left_join(st_pops2, hist_pops2, by = "clean_name") %>%
   left_join(rucc, by = "cty_fips") %>%
   select(1, 2, cty_fips, rucc, y1790:y2010, y2020 = pop20) %>%
   arrange(city_fips) %>%
@@ -124,7 +124,7 @@ joined <- left_join(wa_pops2, hist_pops2, by = "clean_name") %>%
 
 # Diagnostics: in which WA places did the join fail? -------------------------------
 
-nojoin <- anti_join(wa_pops2, hist_pops2, by = "clean_name") %>%
+nojoin <- anti_join(st_pops2, hist_pops2, by = "clean_name") %>%
   arrange(desc(pop20))
 
 # Tiny populations (LaCrosse and Krupp, WA)...very unlikely to have walkable downtown
@@ -152,7 +152,7 @@ pre_auto_towns <- joined %>%
 # Get WA place polygons, join back to selected pre_auto_towns by GEOID,
 # sort, and project to EPSG:6350. 
 
-pre_auto_sf <- places(walist, cb = TRUE) %>%
+pre_auto_sf <- places(st_list, cb = TRUE) %>%
   select(city_fips = GEOID) %>%
   inner_join(pre_auto_towns, by = "city_fips") %>%
   arrange(city_fips) %>%
@@ -171,4 +171,4 @@ pre_auto_sf_out <- pre_auto_sf %>%
   st_drop_geometry()
 
 # Save as CSV; adjust path/filename as desired.
-write_csv(pre_auto_sf_out, "data/wa_pre_auto_places.csv")
+write_csv(pre_auto_sf_out, "data/st_pre_auto_places.csv")

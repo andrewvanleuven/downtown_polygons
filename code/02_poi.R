@@ -4,17 +4,21 @@ library(tidyverse)  # data manipulation, pipes
 library(sf)         # simple features for spatial data
 library(tigris)     # Census TIGER/Line and cartographic boundaries 
 library(mapgl)      # quick interactive map viewing
+library(crsuggest)  # used for identifying suitable coord. ref. system
 
 # ---------------- SETTINGS ----------------
 
+# Pick a state
+st_list <- "WA"
+
 # Input files and paths
-pre_auto_csv <- "data/wa_pre_auto_places.csv"
+pre_auto_csv <- "data/st_pre_auto_places.csv"
 
 # PMTiles vector tiles of global places (Protomaps / Overture-style tiles). 
 pmtiles_url  <- "https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/2025-06-25/places.pmtiles"
 
 # Output GeoJSONL of WA subset of places (extracted from PMTiles)
-wa_geojson   <- "data/places_washington.geojsonl"
+st_geojson   <- "data/places_washington.geojsonl"
 
 
 # ---------------- LOAD PRE-AUTO PLACES ----------------
@@ -24,9 +28,17 @@ pre_auto <- read_csv(pre_auto_csv, show_col_types = FALSE) %>%
   select(1:2) %>% 
   mutate(city_fips = str_pad(city_fips, width = 5, pad = "0"))
 
+# Find the best CRS for plotting/GIS
+crs_best <- counties(st_list, cb = TRUE) %>% 
+  suggest_crs() %>% 
+  filter(crs_units == "m") %>% 
+  first() %>% 
+  pull(crs_code) %>% 
+  as.numeric()
+
 # Get WA place polygons from TIGER and keep only those in the pre-auto universe. 
-pre_auto_sf <- places("WA", cb = TRUE) %>%
-  st_transform(crs = 6596) %>%        # NAD83(2011) / Washington North, in meters 
+pre_auto_sf <- places(st_list, cb = TRUE) %>%
+  st_transform(crs = crs_best) %>% 
   select(city_fips = GEOID) %>%
   filter(city_fips %in% pull(pre_auto, city_fips)) %>% 
   left_join(pre_auto)
@@ -35,10 +47,10 @@ pre_auto_sf <- places("WA", cb = TRUE) %>%
 # ---------------- GET WASHINGTON BBOX ----------------
 
 # Download all US states, filter to WA, and compute its bounding box. 
-wa <- states(cb = TRUE) %>%
-  dplyr::filter(STUSPS == "WA")
+st <- states(cb = TRUE) %>%
+  filter(STUSPS == st_list)
 
-bb <- st_bbox(wa)
+bb <- st_bbox(st)
 
 # PMTiles CLI expects bbox as "min_lon,min_lat,max_lon,max_lat". 
 bbox_string <- sprintf(
@@ -60,41 +72,41 @@ if (pmtiles_path == "") {
 
 # ---------------- RUN EXTRACTION FROM PMTILES ----------------
 
-if (file.exists(wa_geojson)) {
+if (file.exists(st_geojson)) {
   # If the file already exists, skip extraction but report it.
-  cat("✓ Skipping extraction; file already exists:", wa_geojson, "\n")
+  cat("✓ Skipping extraction; file already exists:", st_geojson, "\n")
 } else {
   # Construct a system command to extract the WA bounding box from the global
   # places PMTiles archive to a GeoJSONL file. [web:26][web:67]
   cmd <- sprintf(
-    ""%s" extract "%s" "%s" --bbox="%s"",
+    '"%s" extract "%s" "%s" --bbox="%s"',
     pmtiles_path,
     pmtiles_url,
-    wa_geojson,
+    st_geojson,
     bbox_string
   )
   
   system(cmd)
-  cat("✓ Done. Output:", wa_geojson, "\n")
+  cat("✓ Done. Output:", st_geojson, "\n")
 }
 
 # ---------------- LOAD POIs FOR WASHINGTON ----------------
 
 # Read the extracted WA places layer (GeoJSONL) and project to WA CRS.
 # Depending on file size, this can take around 1 minute. 
-wa_poi <- st_read(wa_geojson, quiet = FALSE) %>%
-  st_transform(6596)
+st_poi <- st_read(st_geojson, quiet = FALSE) %>%
+  st_transform(crs_best)
 
 
 # ---------------- INTERSECT POIs WITH PRE-AUTO PLACES ----------------
 
 # Keep key attributes, then spatially intersect with the pre-auto place polygons
 # to assign each POI to a pre-auto town/city.
-pre_auto_poi <- wa_poi %>%
+pre_auto_poi <- st_poi %>%
   select(
     id,
     mvt_id,
-    name = 2,     # keep the second column as "name" (as in your original script)
+    name = 2,     
     brand,
     categories,
     names

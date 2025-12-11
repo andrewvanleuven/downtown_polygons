@@ -1,6 +1,6 @@
-# Automated Downtown Delineation for Smaller U.S. Towns & Cities
+# Automated Downtown Delineation for Smaller U.S. Places
 
-This repo demonstrates a reproducible method for delineating downtown/central business district polygons using historical population data and modern points-of-interest (POI) data. While the example focuses on Washington state, the approach is designed to work for any U.S. state—simply update the state code in the scripts.
+This repo demonstrates a reproducible method for delineating downtown/central business district polygons using historical population data and modern points-of-interest (POI) data. While the example focuses on Washington state, the approach is designed to work for any U.S. state—simply update the state code in the scripts (see [this example for Wabash, IN](plot/demo_dark2.png)).
 
 <p align="center">
 
@@ -33,7 +33,7 @@ The workflow has three main stages:
 
 ## 2. Universe definition (“pre-auto” towns)
 
-The pre-auto town universe is constructed in the first script ([`01_build_preauto_universe.R`](https://github.com/andrewvanleuven/downtown_polygons/blob/main/code/01_universe.R)):
+The pre-auto town universe is constructed in the first script ([`01_build_preauto_universe.R`](code/01_universe.R)):
 
 -   Start with **all Census places in Washington** with 2020 decennial population (`get_decennial()` for `geography = "place"`; `tidycensus`).\
 -   Join places to the **historical population series** from the Wikipedia-derived CSVs by normalizing place names (e.g., removing “city”, “town”, “village” suffixes) and handling a few ad hoc name fixes (e.g., “Seattle” → “Seattle, Washington”).
