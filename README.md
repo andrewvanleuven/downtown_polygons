@@ -2,7 +2,11 @@
 
 This repo builds approximate downtown/central business district polygons for a universe of Washington towns and small cities, using historical population data and modern points-of-interest (POI) data.
 
-![Morton downtown map](plot/demo_dark.png)
+<p align="center">
+
+<img src="plot/demo_dark.png" alt="Morton downtown map" width="80%"/>
+
+</p>
 
 The workflow has three main stages:
 
