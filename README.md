@@ -1,6 +1,6 @@
 # Automated Downtown Delineation for Smaller U.S. Places
 
-This repo demonstrates a reproducible method for delineating downtown/central business district polygons using historical population data and modern points-of-interest (POI) data. While the example focuses on Washington state, the approach is designed to work for any U.S. state—simply update the state code in the scripts (see [this example for Wabash, IN](plot/demo_dark2.png)).
+This repo demonstrates a reproducible method for delineating downtown/central business district polygons using historical population data and modern points-of-interest (POI) data. While the example focuses on Washington state, the approach is designed to work for any U.S. state—simply update the state code in the scripts (see [this example](plot/demo_dark2.png) for Wabash, IN).
 
 <p align="center">
 
