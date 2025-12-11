@@ -29,7 +29,7 @@ The workflow has three main stages:
     County and place boundaries for Washington downloaded via the [`tigris`](https://github.com/walkerke/tigris) R package (`counties()` and `places()` with `cb = TRUE`). Used for town polygons and county overlays.
 
 -   **POI vector tiles (Overture/Protomaps)**\
-    Places tiles (`places.pmtiles`) served from an S3 bucket and extracted using the [`pmtiles`](https://pmtiles.io/#url=https%3A%2F%2Foverturemaps-tiles-us-west-2-beta.s3.amazonaws.com%2F2025-04-23%2Fplaces.pmtiles&map=6.38/47.293/-121.091) CLI to a WA-only GeoJSONL file. These features are then reprojected and intersected with the pre-auto towns to identify POIs inside each town.
+    The [Overture Maps Places](https://docs.overturemaps.org/guides/places/) tiles (`places.pmtiles`) served from an S3 bucket and extracted using the [`pmtiles`](https://pmtiles.io/#url=https%3A%2F%2Foverturemaps-tiles-us-west-2-beta.s3.amazonaws.com%2F2025-04-23%2Fplaces.pmtiles&map=6.38/47.293/-121.091) CLI to a WA-only GeoJSONL file. These features are then reprojected and intersected with the pre-auto towns to identify POIs inside each town.
 
 ## Universe definition (“pre-auto” towns)
 
