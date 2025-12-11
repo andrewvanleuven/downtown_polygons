@@ -12,6 +12,7 @@ library(sfhotspot)
 
 # Pick a state
 st_list <- "WA"
+st_name <- "Washington"
 
 # Find the best CRS for plotting/GIS
 crs_best <- counties(st_list, cb = TRUE) %>% 
@@ -23,30 +24,26 @@ crs_best <- counties(st_list, cb = TRUE) %>%
 
 # Point-of-interest dots intersected with the pre-auto universe (from previous script).
 # These are stored as a CSV with WKT geometry in geometry_wkt (lon/lat, EPSG:4326). 
-st_dots <- read_csv("data/pre_auto_poi.csv", show_col_types = FALSE) %>%
+st_dots <- read_csv("data/st_pre_auto_poi.csv", show_col_types = FALSE) %>%
   mutate(geometry = st_as_sfc(geometry_wkt, crs = 4326)) %>%
   st_as_sf() %>%
   st_transform(crs_best) %>% 
-  mutate(city_name = str_remove_all(city_name, ", Washington"))
+  mutate(city_name = str_remove_all(city_name, sprintf(", %s", st_name)))
 
 # Quick sanity check: visually confirm points 
-maplibre_view(st_dots %>% filter(city_name == "Kelso"))
+maplibre_view(st_dots %>% filter(city_name == "Cheney"))
 
 # Pre-auto WA place polygons (universe of towns/cities of interest),
-pre_auto <- read_csv("data/st_pre_auto_places.csv", show_col_types = FALSE) %>% 
-  select(1:5) %>%
-  mutate(city_fips = str_pad(city_fips, width = 5, pad = "0"))
-
-pre_auto_sf <- places(st_list, cb = TRUE) %>%
-  st_transform(crs = crs_best) %>%
-  select(city_fips = GEOID) %>%
-  filter(city_fips %in% pull(pre_auto, city_fips)) %>% 
-  left_join(pre_auto) %>%
+pre_auto_sf <- read_csv("data/st_pre_auto_places.csv", show_col_types = FALSE) %>%
+  mutate(geometry = st_as_sfc(geometry_wkt, crs = 4326)) %>%
+  st_as_sf() %>%
+  st_transform(crs_best) %>% 
+  mutate(city_fips = str_pad(city_fips, width = 5, pad = "0")) %>%
   # Clean up city names for nicer labels / joins.
   mutate(
     city_name = str_replace(city_name, " city", ""),
     city_name = str_replace(city_name, " town", ""),
-    city_name = str_remove_all(city_name, ", Washington")
+    city_name = str_remove_all(city_name, sprintf(", %s", st_name))
   )
 
 
@@ -234,9 +231,9 @@ all_blobs <- all_fips %>%
 # ---------------- INSPECT AND EXPORT ----------------
 
 nrow(all_blobs)
-maplibre_view(all_blobs)
+maplibre_view(st_centroid(all_blobs))
 
-# Write WA downtown polygons to GeoJSON (overwrite if it exists). 
+# Write downtown polygons to GeoJSON (overwrite if it exists). 
 st_write(
   all_blobs,
   "data/st_downtowns.geojson",

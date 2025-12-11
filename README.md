@@ -14,7 +14,7 @@ The workflow has three main stages:
 2.  Intersect that universe with **POI data** from vector tiles.
 3.  Run a **kernel density–based** algorithm to delineate downtown polygons.
 
-## 1. Data sources
+## Data sources
 
 -   **Historical town/city populations (1790–2010)**\
     CSV files compiled from Wikipedia for each U.S. state, hosted in the [`Historical-Populations`](https://github.com/CreatingData/Historical-Populations) GitHub project (one CSV per state). These provide long-run population series for cities and towns.
@@ -31,9 +31,9 @@ The workflow has three main stages:
 -   **POI vector tiles (Overture/Protomaps)**\
     Places tiles (`places.pmtiles`) served from an S3 bucket and extracted using the [`pmtiles`](https://pmtiles.io/#url=https%3A%2F%2Foverturemaps-tiles-us-west-2-beta.s3.amazonaws.com%2F2025-04-23%2Fplaces.pmtiles&map=6.38/47.293/-121.091) CLI to a WA-only GeoJSONL file. These features are then reprojected and intersected with the pre-auto towns to identify POIs inside each town.
 
-## 2. Universe definition (“pre-auto” towns)
+## Universe definition (“pre-auto” towns)
 
-The pre-auto town universe is constructed in the first script ([`01_build_preauto_universe.R`](code/01_universe.R)):
+The pre-auto town universe is constructed in the first script ([`01_universe.R`](code/01_universe.R)):
 
 -   Start with **all Census places in Washington** with 2020 decennial population (`get_decennial()` for `geography = "place"`; `tidycensus`).\
 -   Join places to the **historical population series** from the Wikipedia-derived CSVs by normalizing place names (e.g., removing “city”, “town”, “village” suffixes) and handling a few ad hoc name fixes (e.g., “Seattle” → “Seattle, Washington”).
@@ -47,7 +47,7 @@ A place is included in the pre-auto universe if it satisfies a set of criteria t
 
 The output is an `sf` object of Washington places that meet these criteria, saved as a CSV with WKT geometry (`wa_pre_auto_places.csv`).
 
-## 3. Scripts
+## Scripts
 
 ### 01_universe.R
 
@@ -70,7 +70,7 @@ The output is an `sf` object of Washington places that meet these criteria, save
 -   Defines a custom `downtown_kde()` function that processes each town by:
     -   Selecting the largest polygon component for multipart places.
     -   Intersecting POI points within that polygon.
-    -   Running `sfhotspot::hotspot_kde()` on a hexagonal grid to compute KDE values.
+    -   Running `hotspot_kde()` (from the [`sfhotspot`](https://github.com/mpjashby/sfhotspot) R package) on a hexagonal grid to compute KDE values.
     -   Filtering to high-density hexagons (top quartile via min-max scaling).
     -   Dissolving selected hexagons into contiguous blobs and computing blob-level metrics (mean z-score and hex count).
     -   Selecting the best blob via a composite score (hex count × mean z-score).
@@ -78,7 +78,7 @@ The output is an `sf` object of Washington places that meet these criteria, save
 -   Applies the function iteratively to all pre-auto towns with error handling via `tryCatch()`.
 -   Outputs `wa_downtowns.geojson`, containing a downtown polygon for each successfully processed town.
 
-## 4. Example: Morton, WA
+## Example Map
 
 The animation below shows the delineated downtown polygon for Morton, WA, visualized with the `mapgl` R package. Red points represent POIs used in the kernel density estimation, while the blue polygon marks the resulting downtown district boundary. This visualization provides a quick check of whether the automated delineation aligns with the town's actual commercial core.
 

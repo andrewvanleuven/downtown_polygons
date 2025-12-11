@@ -127,5 +127,5 @@ pre_auto_poi_out <- pre_auto_poi %>%
     city_name = str_replace(city_name, " town", "")
   )
 
-write_csv(pre_auto_poi_out, "data/pre_auto_poi.csv")
+write_csv(pre_auto_poi_out, "data/st_pre_auto_poi.csv")
 

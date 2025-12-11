@@ -167,6 +167,7 @@ maplibre_view(pre_auto_sf) # visualize which towns/cities are in the "universe"
 # Note: CSV cannot directly store geometry; use st_as_text() for WKT if needed.
 
 pre_auto_sf_out <- pre_auto_sf %>%
+  st_transform(4326) %>%
   mutate(geometry_wkt = st_as_text(geometry)) %>%
   st_drop_geometry()
 
