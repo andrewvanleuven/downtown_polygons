@@ -45,7 +45,7 @@ A place is included in the pre-auto universe if it satisfies a set of criteria t
 -   It is not in the most urban RUCC category (`rucc > 1`).\
 -   Its 2020 population is between 500 and 150,000.
 
-The output is an `sf` object of Washington places that meet these criteria, saved as a CSV with WKT geometry (`wa_pre_auto_places.csv`).
+The output is an `sf` object of Washington places that meet these criteria, saved as a CSV with WKT geometry (`st_pre_auto_places.csv`).
 
 ## Scripts
 
@@ -55,7 +55,7 @@ The output is an `sf` object of Washington places that meet these criteria, save
 -   Normalizes place names (removing "city", "town", "village" suffixes) to enable joins between the Census and historical datasets, with ad hoc fixes for naming inconsistencies (e.g., "Seattle" → "Seattle, Washington").
 -   Attaches county-level RUCC codes by spatially intersecting place centroids with county boundaries.
 -   Filters places to the pre-auto universe using the population and RUCC criteria described above.
--   Outputs `wa_pre_auto_places.csv`, which contains place identifiers, cleaned names, 2020 population, RUCC codes, and polygon geometries stored as WKT in EPSG:6596 (NAD83(2011) / Washington North).
+-   Outputs `st_pre_auto_places.csv`, which contains place identifiers, cleaned names, 2020 population, RUCC codes, and polygon geometries stored as WKT in EPSG:6596 (NAD83(2011) / Washington North).
 
 ### 02_poi.R
 
@@ -66,7 +66,7 @@ The output is an `sf` object of Washington places that meet these criteria, save
 
 ### 03_downtown.R
 
--   Reads the CSV outputs from the previous two scripts and reconstructs `sf` objects for place polygons (`wa_pre_auto_places.csv`) and POI points (`pre_auto_poi.csv`).
+-   Reads the CSV outputs from the previous two scripts and reconstructs `sf` objects for place polygons (`st_pre_auto_places.csv`) and POI points (`pre_auto_poi.csv`).
 -   Defines a custom `downtown_kde()` function that processes each town by:
     -   Selecting the largest polygon component for multipart places.
     -   Intersecting POI points within that polygon.
@@ -76,7 +76,7 @@ The output is an `sf` object of Washington places that meet these criteria, save
     -   Selecting the best blob via a composite score (hex count × mean z-score).
     -   Buffering and smoothing the selected blob to produce a final downtown polygon.
 -   Applies the function iteratively to all pre-auto towns with error handling via `tryCatch()`.
--   Outputs `wa_downtowns.geojson`, containing a downtown polygon for each successfully processed town.
+-   Outputs `st_downtowns.geojson`, containing a downtown polygon for each successfully processed town.
 
 ## Example Map
 
