@@ -86,7 +86,7 @@ Delineates downtown polygons for a single state (set `st_list`).
 
 ### `04_run_all.R`
 
-Batch-runs the POI extraction (script 2 logic) and downtown delineation (script 3 logic) for all 48 contiguous states. Skips states whose output files already exist, making it safe to restart after interruptions.
+Batch-runs the POI extraction and downtown delineation for all 48 contiguous states. Skips states whose output files already exist, making it safe to restart after interruptions.
 
 ---
 
