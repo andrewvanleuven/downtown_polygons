@@ -178,26 +178,27 @@ b <- mapboxgl(bounds = test_town, style = mapbox_style('satellite')) %>%
 
 compare(a, b)
 
-ggplot() +
-  geom_sf(data = test_town, color = 'white', fill = 'grey20', linewidth = 0.8) +
-  geom_sf(data = test, fill = 'dodgerblue', alpha = 0.6, color = 'white', linewidth = 0.5) +
-  geom_sf(data = test_rds, color = 'gray70', alpha = 0.4, linewidth = 0.3) +
-  geom_sf(data = test_dots, color = '#FF4444', alpha = 0.75, size = 1.25) +
-  labs(
-    title    = 'Downtown District Delineation',
-    subtitle = glue('{test_name}, {st_list}'),
-    caption  = 'Source: Overture Maps, 2025        \n'
-  ) +
-  theme_void(base_family = 'Styrene A', base_size = 18) +
-  theme(
-    plot.title    = element_text(face = 'bold', hjust = 0.5, color = 'white',
-                                 margin = margin(t = 20)),
-    plot.subtitle = element_text(hjust = 0.5, color = 'gray90'),
-    plot.caption  = element_text(color = 'gray70', size = 12),
-    plot.background = element_rect(color = 'white')
-  )
+# The ggplot code below is used to create the map shown in this repository's README page:
 
-ggsave('plot/demo_dark.png', width = 11, height = 8.5, dpi = 300)
+# ggplot() +
+#   geom_sf(data = test_town, color = 'white', fill = 'grey20', linewidth = 0.8) +
+#   geom_sf(data = test, fill = 'dodgerblue', alpha = 0.6, color = 'white', linewidth = 0.5) +
+#   geom_sf(data = test_rds, color = 'gray70', alpha = 0.4, linewidth = 0.3) +
+#   geom_sf(data = test_dots, color = '#FF4444', alpha = 0.75, size = 1.25) +
+#   labs(
+#     title    = 'Downtown District Delineation',
+#     subtitle = glue('{test_name}, {st_list}'),
+#     caption  = 'Source: Overture Maps, 2025        \n'
+#   ) +
+#   theme_void(base_family = 'Styrene A', base_size = 18) +
+#   theme(
+#     plot.title    = element_text(face = 'bold', hjust = 0.5, color = 'white',
+#                                  margin = margin(t = 20)),
+#     plot.subtitle = element_text(hjust = 0.5, color = 'gray90'),
+#     plot.caption  = element_text(color = 'gray70', size = 12),
+#     plot.background = element_rect(color = 'white')
+#   )
+# ggsave('plot/demo_dark.png', width = 11, height = 8.5, dpi = 300)
 
 
 # Run for all towns in a state ------------------------------------------------

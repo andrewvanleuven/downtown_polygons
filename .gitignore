@@ -5,3 +5,9 @@
 .DS_Store
 *.geojsonl
 data/poi/raw/
+data/poi/clean/pre_auto_poi_*.csv
+!data/poi/clean/pre_auto_poi_WA.csv
+data/polygons/downtowns_*.geojson
+!data/polygons/downtowns_WA.geojson
+data/dataverse/
+data/pdf
