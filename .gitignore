@@ -11,3 +11,6 @@ data/polygons/downtowns_*.geojson
 !data/polygons/downtowns_WA.geojson
 data/dataverse/
 data/pdf
+code/paper
+plot/paper
+data/paper
