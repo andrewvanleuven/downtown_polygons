@@ -4,3 +4,4 @@
 .Ruserdata
 .DS_Store
 *.geojsonl
+data/poi/raw/
