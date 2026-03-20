@@ -1,6 +1,6 @@
-# Automated Downtown Delineation for U.S. Small and Mid-Sized Places
+# Automated Downtown Delineation for Smaller U.S. Places
 
-This repository provides a reproducible workflow for delineating downtown/central business district polygons for small and mid-sized U.S. cities and towns. The method identifies a national universe of pre-automobile-era places, collects modern points-of-interest (POI) data within each place's boundaries, and applies a kernel density–based algorithm to produce a downtown polygon. See [this example](plot/demo_dark2.png) for Wabash, IN.
+This repository provides a reproducible workflow for delineating downtown/central business district polygons for small and mid-sized U.S. cities and towns. The method identifies a national universe of pre-automobile-era places, collects modern points-of-interest (POI) data within each place's boundaries, and applies a kernel density–based algorithm to produce a downtown polygon. 
 
 The resulting dataset — approximately 6,500 downtown polygons spanning 47 states — is deposited at Harvard Dataverse: [https://doi.org/10.7910/DVN/RFXZ3F](https://doi.org/10.7910/DVN/RFXZ3F)
 
@@ -13,7 +13,7 @@ The workflow has four scripts:
 1. Build the **pre-auto town universe** — which cities and towns across the contiguous U.S. to include.
 2. Collect **POI data** from Overture Maps vector tiles for a given state.
 3. Run the **kernel density–based delineation** algorithm for a given state.
-4. **Batch-run** scripts 2 and 3 for all 48 contiguous states.
+4. **Batch-run** scripts for all 48 contiguous states.
 
 ---
 
@@ -46,7 +46,7 @@ The pre-auto town universe is defined in `01_universe_national.R` and applied to
 - **Pre-automobile population:** Population ≥ 750 in at least one decennial year from 1900–1940, indicating a commercial core existed before car-dependent development.
 - **Not a central metro county:** RUCC ≥ 2, or RUCC = 1 with Outlying (not Central) OMB designation. This admits small cities in metro-adjacent counties while excluding core suburbs.
 - **2020 population:** Between 500 and 150,000. Excludes ghost towns and large cities where a different delineation approach is warranted.
-- **Not a CDP** (with exceptions): Census Designated Places are excluded because they typically lack incorporated boundaries and pre-auto commercial structure. Exceptions are made for New England and several township-heavy states (CT, ME, MA, NH, RI, VT, NY, NJ, PA, MI, MN, WI) where CDPs often represent genuine historic town centers.
+- **Not a CDP** (with exceptions): Census Designated Places are excluded because they typically lack incorporated boundaries and pre-auto commercial structure. Exceptions are made for New England and several township-heavy states where CDPs often represent genuine historic town centers.
 
 ---
 
