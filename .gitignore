@@ -14,3 +14,6 @@ data/pdf
 code/paper
 plot/paper
 data/paper
+
+CLAUDE.md
+.claude/
