@@ -43,7 +43,7 @@ pmtiles_url <- 'https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/2025-
 
 institutional_regex <- c(
   'campus_building', 'college_university', 'hospital',
-  'medical_service_organizations', 'government_building'
+  'medical_service_organizations'#, 'government_building'
 ) %>% paste(collapse = '|')
 
 st_list <- states(cb = TRUE, resolution = '20m') %>%
@@ -125,11 +125,6 @@ extract_poi <- function(st) {
   out_csv <- sprintf('data/poi/clean/pre_auto_poi_%s.csv', st)
   out_raw <- sprintf('data/poi/raw/places_%s.geojsonl', st)
 
-  if (file.exists(out_csv)) {
-    message(glue('{st}: POI file exists, skipping.'))
-    return(invisible(NULL))
-  }
-
   crs_best <- tryCatch({
     counties(st, cb = TRUE) %>%
       suggest_crs() %>%
@@ -192,11 +187,6 @@ delineate <- function(st) {
 
   out_geojson <- sprintf('data/polygons/downtowns_%s.geojson', st)
   in_csv      <- sprintf('data/poi/clean/pre_auto_poi_%s.csv', st)
-
-  if (file.exists(out_geojson)) {
-    message(glue('{st}: polygon file exists, skipping.'))
-    return(invisible(NULL))
-  }
 
   if (!file.exists(in_csv)) {
     message(glue('{st}: POI CSV not found, skipping.'))
@@ -282,26 +272,45 @@ dir.create('data/dataverse', showWarnings = FALSE)
 # A 'state' column is added since city names are not unique across states.
 # All geometries are reprojected to EPSG:4326 before binding.
 # See README for a description of kde_intensity and downtown_score.
+# Merge all per-state clean POI CSVs into one national file first, so that
+# n_poi counts are available for the polygon export below.
+poi_files <- list.files('data/poi/clean', pattern = '\\.csv$', full.names = TRUE)
+
+all_poi <- map_dfr(poi_files, ~ read_csv(.x, show_col_types = FALSE) %>%
+                     mutate(city_fips = as.character(city_fips),
+                            cty_fips  = as.character(cty_fips)))
+
+all_poi %>%
+  write_csv('data/dataverse/pre_auto_poi_us.csv')
+
+message('Merged POI file written to data/dataverse/pre_auto_poi_us.csv')
+beep()
+
+# Per-city POI count (non-institutional only) — joined into the polygon export.
+n_poi_lookup <- all_poi %>%
+  filter(!institutional) %>%
+  count(city_fips, name = 'n_poi')
+
+# Place-level attributes from the universe file to enrich the polygon output.
+place_attrs <- national_places %>%
+  mutate(city_fips = as.character(city_fips)) %>%
+  select(city_fips, pop_20, cty_fips, cty_type, cty_centrality, cty_msa_adj, rucc)
+
+# Merge all per-state downtown polygon GeoJSONs into one national file.
 polygon_files <- list.files('data/polygons', pattern = '\\.geojson$', full.names = TRUE)
 
 map_dfr(polygon_files, function(f) {
   st <- str_extract(basename(f), '(?<=downtowns_)[A-Z]{2}')
   st_read(f, quiet = TRUE) %>% st_transform(4326) %>% mutate(state = st)
 }) %>%
-  select(city_fips, city_name, state, kde_intensity, downtown_score, geometry) %>%
+  left_join(place_attrs,   by = 'city_fips') %>%
+  left_join(n_poi_lookup,  by = 'city_fips') %>%
+  select(city_fips, city_name, state, pop_20, n_poi,
+         kde_intensity, downtown_score,
+         cty_fips, cty_type, cty_centrality, cty_msa_adj, rucc,
+         geometry) %>%
   st_write('data/dataverse/downtowns_us.geojson', append = FALSE, delete_dsn = TRUE, quiet = TRUE)
 
 message('Merged polygon file written to data/dataverse/downtowns_us.geojson')
-beep()
-
-# Merge all per-state clean POI CSVs into one national file.
-poi_files <- list.files('data/poi/clean', pattern = '\\.csv$', full.names = TRUE)
-
-map_dfr(poi_files, ~ read_csv(.x, show_col_types = FALSE) %>%
-          mutate(city_fips = as.character(city_fips),
-                 cty_fips = as.character(cty_fips))) %>%
-  write_csv('data/dataverse/pre_auto_poi_us.csv')
-
-message('Merged POI file written to data/dataverse/pre_auto_poi_us.csv')
 beep()
 

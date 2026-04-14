@@ -93,11 +93,10 @@ maplibre_view(pre_auto_poi %>% filter(city_name == example_town))
 # output CSV so that downstream scripts can include or exclude them as needed.
 
 institutional_regex <- c(
-  'campus_building',              # college/university campus facilities
-  'college_university',           # higher-ed institutions themselves
-  'hospital',                     # hospitals
-  'medical_service_organizations', # oncology centers, clinics, etc.
-  'government_building'           # courthouses, municipal buildings, etc.
+  'campus_building',               # college/university campus facilities
+  'college_university',            # higher-ed institutions themselves
+  'hospital',                      # hospitals
+  'medical_service_organizations' # oncology centers, clinics, etc.
 ) %>% paste(collapse = '|')
 
 pre_auto_poi_out <- pre_auto_poi %>%
