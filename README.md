@@ -3,7 +3,7 @@
 This repository provides a reproducible workflow for delineating downtown/central business district polygons for small and mid-sized U.S. cities and towns. The method identifies a national universe of pre-automobile-era places, collects modern points-of-interest (POI) data within each place's boundaries, and applies a kernel density–based algorithm to produce a downtown polygon.
 
 - The resulting dataset (approximately 6,500 downtown polygons spanning 47 states) is deposited at Harvard Dataverse [**here**](https://doi.org/10.7910/DVN/RFXZ3F)
-- A working paper describing the dataset and methodology is available [**here**](working_paper.pdf)
+- A working paper describing the dataset and methodology is available [**here**]([working_paper.pdf](https://andrewvanleuven.github.io/downtown_polygons/working_paper.pdf))
 
 <p align="center">
 
