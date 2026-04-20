@@ -4,7 +4,8 @@ This repository provides a reproducible workflow for delineating downtown/centra
 
 - The resulting dataset (approximately 6,500 downtown polygons spanning 47 states) is deposited at Harvard Dataverse [**here**](https://doi.org/10.7910/DVN/RFXZ3F).
 - A working paper describing the dataset and methodology is available [**here**](https://andrewvanleuven.github.io/downtown_polygons/working_paper.pdf).
-
+- See how well the algorithm delineates a central business district by browsing this [**example output**](https://geojson.io/#data=data:text/x-url,https%3A%2F%2Fraw.githubusercontent.com%2Fandrewvanleuven%2Fdowntown_polygons%2Frefs%2Fheads%2Fmain%2Fdata%2Fpolygons%2Fexample.geojson) for Uniontown, PA (switch to satellite view in the bottom-left for best results).
+    
 <p align="center">
 
 <img src="plot/demo_dark.png" alt="Morton, WA downtown map" width="80%"/>
