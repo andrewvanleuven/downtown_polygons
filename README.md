@@ -86,6 +86,10 @@ Delineates downtown polygons for a single state (set `st_list`).
 
 Batch-runs the POI extraction and downtown delineation for all 48 contiguous states. Skips states whose output files already exist, making it safe to restart after interruptions.
 
+### `05_manual_validation.R`
+
+Interactively steps through a reproducible random sample of downtown polygons overlaid on satellite imagery so each one can be manually rated for accuracy.
+
 ------------------------------------------------------------------------
 
 ## File structure
