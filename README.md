@@ -3,7 +3,7 @@
 This repository provides a reproducible workflow for delineating downtown/central business district polygons for small and mid-sized U.S. cities and towns. The method identifies a national universe of pre-automobile-era places, collects modern points-of-interest (POI) data within each place's boundaries, and applies a kernel density–based algorithm to produce a downtown polygon.
 
 - The resulting dataset (approximately 6,500 downtown polygons spanning 47 states) is deposited at Harvard Dataverse [**here**](https://doi.org/10.7910/DVN/RFXZ3F).
-- A working paper describing the dataset and methodology is available [**here**](https://andrewvanleuven.github.io/downtown_polygons/working_paper.pdf).
+- The dataset and methodology are described in an open-access article in *Environment and Planning B: Urban Analytics and City Science*, available [**here**](https://doi.org/10.1177/23998083261500874).
 - See how well the algorithm delineates a central business district by browsing this [**example output**](https://geojson.io/#data=data:text/x-url,https%3A%2F%2Fraw.githubusercontent.com%2Fandrewvanleuven%2Fdowntown_polygons%2Frefs%2Fheads%2Fmain%2Fdata%2Fpolygons%2Fexample.geojson) for Uniontown, PA (switch to satellite view in the bottom-left for best results).
     
 <p align="center">
@@ -110,6 +110,10 @@ data/
 The compiled dataset is publicly available at Harvard Dataverse (CC0 1.0):
 
 > Van Leuven, Andrew, 2026, "Downtown Business District Polygons for Pre-Automobile-Era U.S. Cities and Towns", <https://doi.org/10.7910/DVN/RFXZ3F>, Harvard Dataverse.
+
+Please also cite the accompanying article:
+
+> Van Leuven, Andrew J. (2026). Downtown business district polygons for pre-automobile-era U.S. cities and towns. *Environment and Planning B: Urban Analytics and City Science*. <https://doi.org/10.1177/23998083261500874>
 
 The deposit includes:
 
